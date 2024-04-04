@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,10 +15,24 @@ public class Tail : MonoBehaviour
     private List< Transform> _details = new List<Transform>();
     private List<Vector3> _positionHistory = new List<Vector3>();
     private List<Quaternion> _rotationHistory = new List<Quaternion>();
+    private Material _skinMaterial;
+    private int _playerLayer;
+    private bool _isPlayer;
 
-    private Material _currentSkin;
+   private void SetPlayerLayer(GameObject gameObject) {
+        gameObject.layer = _playerLayer;
+        var childrens = GetComponentsInChildren<Transform>();
+        for (int i = 0; i < childrens.Length; i++) {
+            childrens[i].gameObject.layer = _playerLayer;
+        }
+    }
 
-    public void Init(Transform head, float speed, int detailCount) {
+    public void Init(Transform head, float speed, int detailCount,int playerLayer, bool isPlayer) {
+        _playerLayer = playerLayer;
+        _isPlayer = isPlayer;
+
+        if (isPlayer) SetPlayerLayer(gameObject);
+        
         _snakeSpeed = speed;
         _head = head;   
 
@@ -54,23 +69,27 @@ public class Tail : MonoBehaviour
     }
 
     public void SetSkin(Material material) {
-        
+        _skinMaterial = material;
         for (int i = 0; i < _details.Count; i++) {
-            _details[i].GetComponent<SetSkin>().Set(material);
+            _details[i].GetComponent<SetSkin>().Set(_skinMaterial);
         }
+
     }
 
     private void AddDetail() {
         Vector3 position = _details[_details.Count - 1].position;
         Quaternion rotation = _details[_details.Count - 1].rotation;
         Transform detail = Instantiate(_detailPrefab, position, rotation);
-
+        if (_isPlayer) SetPlayerLayer(detail.gameObject);
 
         //ƒобавленна€ в список деталей ставитс€ на первое место
         _details.Insert(0, detail);
         //ѕозици€  добавл€етс€ в конец истории
         _positionHistory.Add(position);
         _rotationHistory.Add(rotation);
+
+        detail.GetComponent<SetSkin>().Set(_skinMaterial);
+
     }
 
     private void RemoveDetail() {
@@ -115,9 +134,45 @@ public class Tail : MonoBehaviour
         }
     }
 
-    internal void Destroy() {
+    public DetailPositions GetDetailPosition() {
+
+        int detailsCount  = _details.Count;
+
+        DetailPosition[]  ds  =  new DetailPosition[detailsCount];
+        for (int i = 0; i < detailsCount; i++) {
+            ds[i] = new DetailPosition() {
+                x = _details[i].position.x,
+                z = _details[i].position.z,
+            } ;
+        }
+
+        DetailPositions detailPositions = new DetailPositions() {
+            ds = ds
+        };
+        return detailPositions;
+
+    }
+
+    public void Destroy() {
         for (int i = 0; i < _details.Count; i++) {
             Destroy(_details[i].gameObject);
         }
     }
+
+   
+}
+
+[System.Serializable]
+public struct  DetailPosition {
+    public float x;
+    public float z;
+
+}
+
+[System.Serializable]
+public struct DetailPositions
+{
+    public string id;
+    public DetailPosition[] ds;
+
 }

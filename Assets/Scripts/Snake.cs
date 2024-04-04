@@ -5,8 +5,9 @@ public class Snake : MonoBehaviour
 {
     public float Speed { get{return _speed;}}
 
+    [SerializeField] private int _playerLayer = 6;
     [SerializeField] private Tail _tailPrefab;
-    [SerializeField] private Transform _head;
+    [field: SerializeField] public Transform _head { get; private set; }
     [SerializeField] private float _speed = 2f;
 
     [SerializeField] private SetSkin _setSkin;
@@ -18,9 +19,16 @@ public class Snake : MonoBehaviour
 
     private Tail _tail;
 
-    public void Init( int detailCount) {
+    public void Init( int detailCount, bool isPlayer = false) {
+        if (isPlayer) {
+            gameObject.layer = _playerLayer;
+            var childrens = GetComponentsInChildren<Transform>();
+            for ( int i = 0; i < childrens.Length; i++) {
+                childrens[i].gameObject.layer = _playerLayer;
+            }
+        }
         Tail tail = Instantiate(_tailPrefab, transform.position, Quaternion.identity);
-        tail.Init(_head, _speed, detailCount);
+        tail.Init(_head, _speed, detailCount, _playerLayer, isPlayer);
         _tail = tail;
         
     }
@@ -34,7 +42,12 @@ public class Snake : MonoBehaviour
         _tail.SetSkin(material);
     }
 
-    public void Destroy() {
+    public void Destroy(string clientID) {
+
+        var detailPositions = _tail.GetDetailPosition();
+        detailPositions.id = clientID;
+        string json = JsonUtility.ToJson(detailPositions);
+        MultiplayerManager.Instance.SendMessage("gameOver", json);
         _tail.Destroy();
         Destroy(gameObject);
 

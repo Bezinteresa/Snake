@@ -45,6 +45,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b02e13290d2b8664689ad1f8ef248d1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _colissionLayer:
+    serializedVersion: 2
+    m_Bits: 55
+  _overlapRadius: 0.5
   _rotateSpeed: 90
 --- !u!1 &7296691475361314996
 GameObject:
@@ -147,7 +151,7 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
