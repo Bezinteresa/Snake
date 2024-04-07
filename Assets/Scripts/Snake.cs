@@ -11,6 +11,7 @@ public class Snake : MonoBehaviour
     [SerializeField] private float _speed = 2f;
 
     [SerializeField] private SetSkin _setSkin;
+    [SerializeField] ShowName _showName;
 
     //Перенесли в PlayerAim
     //[SerializeField] private float _rotateSpeed = 90f;
@@ -40,6 +41,10 @@ public class Snake : MonoBehaviour
     public void SetSkin(Material material) {
         _setSkin.Set(material);
         _tail.SetSkin(material);
+    }
+
+    public void SetName(string login) {
+        _showName.SetText(login);
     }
 
     public void Destroy(string clientID) {

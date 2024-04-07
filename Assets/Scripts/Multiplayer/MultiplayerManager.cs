@@ -118,6 +118,7 @@ public class MultiplayerManager : ColyseusManager<MultiplayerManager>
         _enemies.Add(key, enemy);
 
         snake.SetSkin(_skins.GetMaterial(player.skin));
+        snake.SetName(player.login);
 
         AddLeader(key, player);
 
